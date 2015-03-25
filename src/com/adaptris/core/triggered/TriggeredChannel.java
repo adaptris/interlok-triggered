@@ -5,6 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.AdaptrisMessageListener;
@@ -67,7 +71,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public final class TriggeredChannel extends Channel implements
     AdaptrisMessageListener {
 
+  @NotNull
+  @Valid
+  @AutoPopulated
   private Trigger trigger;
+  @NotNull
+  @Valid
+  @AutoPopulated
   private AdaptrisMessageFactory messageFactory;
   private EventHandler eventHandlerForMessages;
 
