@@ -8,6 +8,7 @@ package com.adaptris.core.triggered;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServer;
@@ -35,6 +36,7 @@ import com.adaptris.core.XStreamMarshaller;
 import com.adaptris.core.fs.FsConsumer;
 import com.adaptris.core.jms.JmsConnection;
 import com.adaptris.core.jms.PtpProducer;
+import com.adaptris.core.jms.jndi.StandardJndiImplementation;
 import com.adaptris.core.stubs.FailFirstMockMessageProducer;
 import com.adaptris.core.stubs.LicenseStub;
 import com.adaptris.core.stubs.MockEventHandlerWithState;
@@ -160,6 +162,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
   @Override
   protected Object retrieveObjectForSampleConfig() {
     TriggeredChannel c = new TriggeredChannel();
+    c.setUniqueId(UUID.randomUUID().toString());
     ChannelList cl = new ChannelList();
     try {
       c.setTrigger(createTriggerForConfig());
@@ -177,8 +180,9 @@ public class TriggeredChannelTest extends ExampleChannelCase {
 
   private Workflow createDefaultWorkflowForConfig() throws CoreException {
     StandardWorkflow wf = new StandardWorkflow();
+    wf.setUniqueId(UUID.randomUUID().toString());
     StandaloneProducer ep = new StandaloneProducer();
-    ep.setConnection(new JmsConnection());
+    ep.setConnection(new JmsConnection(new StandardJndiImplementation("MyJndiName")));
     PtpProducer ptp = new PtpProducer();
     ptp.setDestination(new ConfiguredProduceDestination("dest"));
     ep.setProducer(ptp);
