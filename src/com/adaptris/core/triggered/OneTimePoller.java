@@ -8,8 +8,10 @@ package com.adaptris.core.triggered;
 
 import com.adaptris.core.CoreException;
 import com.adaptris.core.PollerImp;
-import com.adaptris.util.license.License;
-import com.adaptris.util.license.License.LicenseType;
+import com.adaptris.core.licensing.License;
+import com.adaptris.core.licensing.License.LicenseType;
+import com.adaptris.core.licensing.LicenseChecker;
+import com.adaptris.core.licensing.LicensedComponent;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -21,10 +23,15 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @license STANDARD
  */
 @XStreamAlias("triggered-one-time-poller")
-public class OneTimePoller extends PollerImp {
+public class OneTimePoller extends PollerImp implements LicensedComponent {
 
   @Override
-  public boolean isEnabled(License license) throws CoreException {
+  public void prepare() throws CoreException {
+    LicenseChecker.newChecker().checkLicense(this);
+  }
+
+  @Override
+  public boolean isEnabled(License license) {
     return license.isEnabled(LicenseType.Standard);
   }
 

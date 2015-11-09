@@ -12,7 +12,6 @@ import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.AdaptrisMessageListener;
-import com.adaptris.core.AdaptrisPollingConsumer;
 import com.adaptris.core.Channel;
 import com.adaptris.core.ClosedState;
 import com.adaptris.core.ComponentState;
@@ -23,9 +22,11 @@ import com.adaptris.core.EventHandler;
 import com.adaptris.core.ProcessingExceptionHandler;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.Workflow;
+import com.adaptris.core.licensing.License;
+import com.adaptris.core.licensing.License.LicenseType;
+import com.adaptris.core.licensing.LicenseChecker;
+import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.LifecycleHelper;
-import com.adaptris.util.license.License;
-import com.adaptris.util.license.License.LicenseType;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -69,7 +70,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("triggered-channel")
 public final class TriggeredChannel extends Channel implements
-    AdaptrisMessageListener {
+ AdaptrisMessageListener, LicensedComponent {
 
   @NotNull
   @Valid
@@ -121,6 +122,7 @@ public final class TriggeredChannel extends Channel implements
 
   @Override
   public void prepare() throws CoreException {
+    LicenseChecker.newChecker().checkLicense(this);
     if (getEventHandlerForMessages() != null) {
       log.info("EventHandler configured, bypassing Adapters event handler");
       registerEventHandler(getEventHandlerForMessages());
@@ -156,9 +158,8 @@ public final class TriggeredChannel extends Channel implements
   }
 
   @Override
-  public boolean isEnabled(License license) throws CoreException {
-    return license.isEnabled(LicenseType.Standard) && super.isEnabled(license) && trigger.isEnabled(license)
-        && (getEventHandlerForMessages() != null ? getEventHandlerForMessages().isEnabled(license) : true);
+  public boolean isEnabled(License license) {
+    return license.isEnabled(LicenseType.Standard);
   }
 
   /**

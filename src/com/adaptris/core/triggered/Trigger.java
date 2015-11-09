@@ -15,9 +15,11 @@ import com.adaptris.core.NullConnection;
 import com.adaptris.core.NullMessageConsumer;
 import com.adaptris.core.NullMessageProducer;
 import com.adaptris.core.StandaloneConsumer;
+import com.adaptris.core.licensing.License;
+import com.adaptris.core.licensing.License.LicenseType;
+import com.adaptris.core.licensing.LicenseChecker;
+import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.LifecycleHelper;
-import com.adaptris.util.license.License;
-import com.adaptris.util.license.License.LicenseType;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -30,7 +32,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author $Author: lchan $
  */
 @XStreamAlias("trigger")
-public class Trigger extends StandaloneConsumer {
+public class Trigger extends StandaloneConsumer implements LicensedComponent {
 
   @NotNull
   @Valid
@@ -59,9 +61,14 @@ public class Trigger extends StandaloneConsumer {
   }
 
   @Override
-  public boolean isEnabled(License license) throws CoreException {
-    return license.isEnabled(LicenseType.Standard) && getConsumer().isEnabled(license) && getProducer().isEnabled(license)
-        && getConnection().isEnabled(license);
+  public void prepare() throws CoreException {
+    LicenseChecker.newChecker().checkLicense(this);
+    super.prepare();
+  }
+
+  @Override
+  public boolean isEnabled(License license) {
+    return license.isEnabled(LicenseType.Standard);
   }
 
   @Override
