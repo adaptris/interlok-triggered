@@ -38,7 +38,6 @@ import com.adaptris.core.jms.JmsConnection;
 import com.adaptris.core.jms.PtpProducer;
 import com.adaptris.core.jms.jndi.StandardJndiImplementation;
 import com.adaptris.core.stubs.FailFirstMockMessageProducer;
-import com.adaptris.core.stubs.LicenseStub;
 import com.adaptris.core.stubs.MockEventHandlerWithState;
 import com.adaptris.core.stubs.MockMessageConsumer;
 import com.adaptris.core.stubs.MockMessageProducer;
@@ -60,7 +59,6 @@ public class TriggeredChannelTest extends ExampleChannelCase {
   protected void setUp() throws Exception {
     adapterEventHandler = new MockEventHandlerWithState("AdapterEventHandler");
     adapter = new Adapter();
-    adapter.registerLicense(new LicenseStub());
     adapter.setEventHandler(adapterEventHandler);
     adapter.setUniqueId(new GuidGenerator().getUUID());
     channel = createTriggeredChannel(new MockMessageConsumer());

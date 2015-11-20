@@ -14,7 +14,6 @@ import javax.management.ObjectName;
 import com.adaptris.core.BaseCase;
 import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.CoreException;
-import com.adaptris.core.stubs.LicenseStub;
 import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
 
@@ -67,12 +66,6 @@ public class JmxTriggerTest extends BaseCase {
     finally {
       stop(jmx);
     }
-  }
-
-  public void testIsEnabled() throws Exception {
-    MockMessageListener stub = new MockMessageListener();
-    JmxConsumer jmx = new JmxConsumer();
-    assertTrue(jmx.isEnabled(new LicenseStub()));
   }
 
   public void testInit() throws Exception {

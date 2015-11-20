@@ -7,8 +7,10 @@ import javax.management.ObjectName;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
-import com.adaptris.util.license.License;
-import com.adaptris.util.license.License.LicenseType;
+import com.adaptris.core.licensing.License;
+import com.adaptris.core.licensing.License.LicenseType;
+import com.adaptris.core.licensing.LicenseChecker;
+import com.adaptris.core.licensing.LicensedComponent;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -25,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * 
  */
 @XStreamAlias("triggered-jmx-consumer")
-public class JmxConsumer extends AdaptrisMessageConsumerImp {
+public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedComponent {
 
   public static final String JMX_OBJECT_NAME_PREFIX = "Adaptris:type=TriggeredChannel, uid=";
 
@@ -39,9 +41,15 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp {
     this();
     setDestination(d);
   }
+
   @Override
-  public boolean isEnabled(License l) throws CoreException {
-    return l.isEnabled(LicenseType.Standard);
+  public void prepare() throws CoreException {
+    LicenseChecker.newChecker().checkLicense(this);
+  }
+
+  @Override
+  public boolean isEnabled(License license) {
+    return license.isEnabled(LicenseType.Standard);
   }
 
   @Override
