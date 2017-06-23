@@ -27,6 +27,7 @@ import com.adaptris.core.licensing.License.LicenseType;
 import com.adaptris.core.licensing.LicenseChecker;
 import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.LifecycleHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -315,5 +316,10 @@ public final class TriggeredChannel extends Channel implements
    */
   public void setEventHandlerForMessages(EventHandler eh) {
     eventHandlerForMessages = eh;
+  }
+  
+  @Override
+  public String friendlyName() {
+    return LoggingHelper.friendlyName(this);
   }
 }
