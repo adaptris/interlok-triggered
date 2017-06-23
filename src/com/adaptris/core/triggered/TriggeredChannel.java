@@ -12,10 +12,10 @@ import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.AdaptrisMessageListener;
+import com.adaptris.core.AdaptrisPollingConsumer;
 import com.adaptris.core.Channel;
 import com.adaptris.core.ClosedState;
 import com.adaptris.core.ComponentState;
-import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.EventHandler;
@@ -295,12 +295,7 @@ public final class TriggeredChannel extends Channel implements
     }
 
     public String createFriendlyThreadName() {
-      ConsumeDestination cd = workflow.getConsumer().getDestination();
-      if (cd != null) {
-        return cd.getDeliveryThreadName();
-      }
-      return getFriendlyClassName() + "@"
-          + Integer.toHexString(hashCode());
+      return workflow.friendlyName();
     }
   }
 
