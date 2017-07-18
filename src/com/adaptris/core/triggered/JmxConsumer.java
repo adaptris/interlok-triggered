@@ -110,4 +110,7 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
     }
   }
 
+  String threadName() {
+    return retrieveAdaptrisMessageListener().friendlyName();
+  }
 }

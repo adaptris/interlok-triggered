@@ -25,7 +25,7 @@ public class JmxChannelTrigger implements JmxChannelTriggerMBean {
     String oldName = Thread.currentThread().getName();
 
     try {
-      Thread.currentThread().setName(owner.getDestination().getDeliveryThreadName());
+      Thread.currentThread().setName(owner.threadName());
       AdaptrisMessage msg = defaultIfNull(owner.getMessageFactory()).newMessage();
       owner.retrieveAdaptrisMessageListener().onAdaptrisMessage(msg);
     }

@@ -12,10 +12,10 @@ import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.AdaptrisMessageListener;
+import com.adaptris.core.AdaptrisPollingConsumer;
 import com.adaptris.core.Channel;
 import com.adaptris.core.ClosedState;
 import com.adaptris.core.ComponentState;
-import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.EventHandler;
@@ -27,6 +27,7 @@ import com.adaptris.core.licensing.License.LicenseType;
 import com.adaptris.core.licensing.LicenseChecker;
 import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.LifecycleHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -294,12 +295,7 @@ public final class TriggeredChannel extends Channel implements
     }
 
     public String createFriendlyThreadName() {
-      ConsumeDestination cd = workflow.getConsumer().getDestination();
-      if (cd != null) {
-        return cd.getDeliveryThreadName();
-      }
-      return getFriendlyClassName() + "@"
-          + Integer.toHexString(hashCode());
+      return workflow.friendlyName();
     }
   }
 
@@ -315,5 +311,10 @@ public final class TriggeredChannel extends Channel implements
    */
   public void setEventHandlerForMessages(EventHandler eh) {
     eventHandlerForMessages = eh;
+  }
+  
+  @Override
+  public String friendlyName() {
+    return LoggingHelper.friendlyName(this);
   }
 }
