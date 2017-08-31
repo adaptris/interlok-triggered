@@ -1,6 +1,7 @@
 package com.adaptris.core.triggered;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -15,7 +16,6 @@ import com.adaptris.core.AdaptrisMessageListener;
 import com.adaptris.core.AdaptrisPollingConsumer;
 import com.adaptris.core.Channel;
 import com.adaptris.core.ClosedState;
-import com.adaptris.core.ComponentState;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.EventHandler;
@@ -99,11 +99,6 @@ public final class TriggeredChannel extends Channel implements
     super.changeState(ClosedState.getInstance());
   }
 
-  @Override
-  public void changeState(ComponentState s) {
-    // Do nothing, as this is called from super lifecycle methods
-    // and our own lifecycle takes precedence...
-  }
 
   /**
    *
@@ -118,7 +113,6 @@ public final class TriggeredChannel extends Channel implements
     }
     trigger.getConsumer().registerAdaptrisMessageListener(this);
     LifecycleHelper.init(trigger);
-
   }
 
   @Override
@@ -138,6 +132,7 @@ public final class TriggeredChannel extends Channel implements
   @Override
   public void start() throws CoreException {
     LifecycleHelper.start(trigger);
+    startTime = new Date();
   }
 
   /**
@@ -146,6 +141,7 @@ public final class TriggeredChannel extends Channel implements
    */
   @Override
   public void stop() {
+    stopTime = new Date();
     LifecycleHelper.stop(trigger);
   }
 
@@ -169,6 +165,9 @@ public final class TriggeredChannel extends Channel implements
    */
   public synchronized void onAdaptrisMessage(AdaptrisMessage msg) {
     List<Thread> threads = new ArrayList<Thread>();
+    // Capture the last Starttime (because we stop/close).
+    Date lastStartTime = lastStartTime();
+    Date lastStopTime = lastStopTime();
     try {
       if (getEventHandlerForMessages() != null) {
         LifecycleHelper.start(eventHandler);
@@ -200,6 +199,8 @@ public final class TriggeredChannel extends Channel implements
         LifecycleHelper.stop(eventHandler);
         LifecycleHelper.close(eventHandler);
       }
+      startTime = lastStartTime;
+      stopTime = lastStopTime;
     }
     log.trace("Trigger processing complete");
     try {
@@ -211,8 +212,7 @@ public final class TriggeredChannel extends Channel implements
   }
 
   private void waitForErrorHandler() {
-    log.trace("Waiting for the MessageErrorHandler to "
-        + "process any failed messages");
+    log.trace("Waiting for the MessageErrorHandler to process any failed messages");
     TriggeredProcessor t = (TriggeredProcessor) retrieveActiveMsgErrorHandler();
     while (!t.processingCompleted()) {
       try {
