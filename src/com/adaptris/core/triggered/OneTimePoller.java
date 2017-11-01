@@ -52,8 +52,6 @@ public class OneTimePoller extends PollerImp implements LicensedComponent {
   /** @see com.adaptris.core.AdaptrisComponent#start() */
   @Override
   public void start() {
-    log.trace("Processing Messages");
-    processMessages();
   }
 
   /** @see com.adaptris.core.AdaptrisComponent#stop() */
@@ -66,6 +64,11 @@ public class OneTimePoller extends PollerImp implements LicensedComponent {
   @Override
   public void close() {
     // na...
+  }
+
+  public void processMessages() {
+    log.trace("Processing Messages");
+    super.processMessages();
   }
 
 }

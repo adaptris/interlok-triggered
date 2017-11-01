@@ -19,6 +19,7 @@ import com.adaptris.core.ClosedState;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.EventHandler;
+import com.adaptris.core.Poller;
 import com.adaptris.core.ProcessingExceptionHandler;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.Workflow;
@@ -278,27 +279,6 @@ public final class TriggeredChannel extends Channel implements
     messageFactory = f;
   }
 
-  private class WorkflowStarter implements Runnable {
-    private Workflow workflow;
-
-    WorkflowStarter(Workflow w) {
-      workflow = w;
-    }
-
-    public void run() {
-      try {
-        LifecycleHelper.start(workflow);
-      }
-      catch (CoreException e) {
-        log.error("Failure to start workflow", e);
-      }
-    }
-
-    public String createFriendlyThreadName() {
-      return workflow.friendlyName();
-    }
-  }
-
   /**
    * @return the eventHandlerForMessages
    */
@@ -312,9 +292,39 @@ public final class TriggeredChannel extends Channel implements
   public void setEventHandlerForMessages(EventHandler eh) {
     eventHandlerForMessages = eh;
   }
-  
+
   @Override
   public String friendlyName() {
     return LoggingHelper.friendlyName(this);
   }
+
+
+  private class WorkflowStarter implements Runnable {
+    private Workflow workflow;
+
+    WorkflowStarter(Workflow w) {
+      workflow = w;
+    }
+
+    public void run() {
+      try {
+        LifecycleHelper.start(workflow);
+        if (workflow.getConsumer() instanceof AdaptrisPollingConsumer) {
+          Poller p = ((AdaptrisPollingConsumer) workflow.getConsumer()).getPoller();
+          if (p instanceof OneTimePoller) {
+            ((OneTimePoller) p).processMessages();
+          }
+        }
+      }
+      catch (CoreException e) {
+        log.error("Failure to start workflow", e);
+      }
+    }
+
+    public String createFriendlyThreadName() {
+      return workflow.friendlyName();
+    }
+  }
+
+  
 }
