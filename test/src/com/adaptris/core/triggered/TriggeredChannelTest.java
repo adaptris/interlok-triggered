@@ -37,9 +37,11 @@ import com.adaptris.core.fs.FsConsumer;
 import com.adaptris.core.jms.JmsConnection;
 import com.adaptris.core.jms.PtpProducer;
 import com.adaptris.core.jms.jndi.StandardJndiImplementation;
+import com.adaptris.core.stubs.FailFirstMockMessageProducer;
 import com.adaptris.core.stubs.MockEventHandlerWithState;
 import com.adaptris.core.stubs.MockMessageConsumer;
 import com.adaptris.core.stubs.MockMessageProducer;
+import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.util.GuidGenerator;
 import com.adaptris.util.TimeInterval;
 
@@ -117,24 +119,24 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     adapter.requestClose();
   }
 
-  // public void testTriggerWithFailure() throws Exception {
-  // LifecycleHelper.initAndStart(adapter);
-  // LifecycleHelper.stopAndClose(adapter);
-  // StandardWorkflow twf = findWorkflow(channel.getWorkflowList().getWorkflows(), triggeredWorkflowKey);
-  // MockMessageConsumer mc = (MockMessageConsumer) channel.getTrigger().getConsumer();
-  // MockMessageProducer tp = new FailFirstMockMessageProducer();
-  // twf.setProducer(tp);
-  // LifecycleHelper.initAndStart(adapter);
-  // mc.submitMessage(AdaptrisMessageFactory.getDefaultInstance().newMessage());
-  // waitForMessages(tp, 1);
-  // assertEquals("Number of messages produced", 1, tp.getMessages().size());
-  // assertEquals("Trigger message produced", 1, ((MockMessageProducer) channel.getTrigger().getProducer()).getMessages().size());
-  // checkMessagePayloads(tp.getMessages());
-  //
-  // assertWorkflowState(channel.getWorkflowList().getWorkflows(), ClosedState.getInstance());
-  // assertEquals(ClosedState.getInstance(), channel.getEventHandlerForMessages().retrieveComponentState());
-  // LifecycleHelper.stopAndClose(adapter);
-  // }
+  public void testTriggerWithFailure() throws Exception {
+    LifecycleHelper.initAndStart(adapter);
+    LifecycleHelper.stopAndClose(adapter);
+    StandardWorkflow twf = findWorkflow(channel.getWorkflowList().getWorkflows(), triggeredWorkflowKey);
+    MockMessageConsumer mc = (MockMessageConsumer) channel.getTrigger().getConsumer();
+    MockMessageProducer tp = new FailFirstMockMessageProducer();
+    twf.setProducer(tp);
+    LifecycleHelper.initAndStart(adapter);
+    mc.submitMessage(AdaptrisMessageFactory.getDefaultInstance().newMessage());
+    waitForMessages(tp, 1);
+    assertEquals("Number of messages produced", 1, tp.getMessages().size());
+    assertEquals("Trigger message produced", 1, ((MockMessageProducer) channel.getTrigger().getProducer()).getMessages().size());
+    checkMessagePayloads(tp.getMessages());
+
+    assertWorkflowState(channel.getWorkflowList().getWorkflows(), ClosedState.getInstance());
+    assertEquals(ClosedState.getInstance(), channel.getEventHandlerForMessages().retrieveComponentState());
+    LifecycleHelper.stopAndClose(adapter);
+  }
 
   private void assertWorkflowState(List l, ComponentState state) {
     for (Iterator i = l.iterator(); i.hasNext();) {

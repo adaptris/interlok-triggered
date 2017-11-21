@@ -6,6 +6,7 @@
  */
 package com.adaptris.core.triggered;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.adaptris.core.RetryMessageErrorHandlerImp;
@@ -43,7 +44,18 @@ public class RetryMessageErrorHandler extends RetryMessageErrorHandlerImp implem
    */
   @Override
   public boolean processingCompleted() {
-    return retryList.size() == 0 && inProgress.size() == 0;
+    return (assertEmpty(retryList, inProgress)) || executorShutdown();
   }
 
+  private boolean assertEmpty(List... lists) {
+    int rc = 0;
+    for (List list : lists) {
+      rc += list.size() == 0 ? 1 : 0;
+    }
+    return rc == lists.length;
+  }
+
+  private boolean executorShutdown() {
+    return executor != null ? executor.isShutdown() : true;
+  }
 }

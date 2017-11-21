@@ -170,9 +170,8 @@ public final class TriggeredChannel extends Channel implements
     Date lastStartTime = lastStartTime();
     Date lastStopTime = lastStopTime();
     try {
-      if (getEventHandlerForMessages() != null) {
-        LifecycleHelper.start(eventHandler);
-      }
+      LifecycleHelper.initAndStart(retrieveActiveMsgErrorHandler());
+      LifecycleHelper.initAndStart(getEventHandlerForMessages());
       super.init();
       LifecycleHelper.start(getProduceConnection());
       // It's valid to start the consume connection before the workflow
@@ -196,10 +195,7 @@ public final class TriggeredChannel extends Channel implements
       waitForErrorHandler();
       super.stop();
       super.close();
-      if (getEventHandlerForMessages() != null) {
-        LifecycleHelper.stop(eventHandler);
-        LifecycleHelper.close(eventHandler);
-      }
+      LifecycleHelper.stopAndClose(getEventHandlerForMessages());
       startTime = lastStartTime;
       stopTime = lastStopTime;
     }
