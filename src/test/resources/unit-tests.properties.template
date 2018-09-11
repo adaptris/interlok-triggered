@@ -1,2 +1,2 @@
-junit.ChannelCase.baseDir=${basedir}/build/example-xml
+ChannelCase.baseDir=@BUILD_DIR@/examples
 
