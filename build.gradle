@@ -81,22 +81,6 @@ repositories {
     }
   maven { url "$nexusBaseUrl/content/groups/public" }
   maven { url "$nexusBaseUrl/content/repositories/snapshots" }
-  maven { url "$nexusBaseUrl/content/content/repositories/releases" }
-  maven {
-      credentials {
-        username repoUsername
-        password repoPassword
-      }
-      url "$nexusBaseUrl/content/repositories/adaptris-private-releases"
-    }
-  maven {
-      credentials {
-        username repoUsername
-        password repoPassword
-      }
-      url "$nexusBaseUrl/content/repositories/adaptris-private-snapshots"
-    }
-
 }
 
 configurations {
