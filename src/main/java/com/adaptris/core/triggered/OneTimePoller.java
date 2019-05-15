@@ -26,11 +26,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class OneTimePoller extends PollerImp implements LicensedComponent {
 
   @Override
-  public void prepare() throws CoreException {
-    LicenseChecker.newChecker().checkLicense(this);
-  }
-
-  @Override
   public boolean isEnabled(License license) {
     return license.isEnabled(LicenseType.Standard);
   }
@@ -45,27 +40,12 @@ public class OneTimePoller extends PollerImp implements LicensedComponent {
 
   /** @see com.adaptris.core.AdaptrisComponent#init() */
   @Override
-  public void init() {
-    // do nothing...
+  public void init() throws CoreException {
+    LicenseChecker.newChecker().checkLicense(this);
+    super.init();
   }
 
-  /** @see com.adaptris.core.AdaptrisComponent#start() */
   @Override
-  public void start() {
-  }
-
-  /** @see com.adaptris.core.AdaptrisComponent#stop() */
-  @Override
-  public void stop() {
-    ;
-  }
-
-  /** @see com.adaptris.core.AdaptrisComponent#close() */
-  @Override
-  public void close() {
-    // na...
-  }
-
   public void processMessages() {
     log.trace("Processing Messages");
     super.processMessages();
