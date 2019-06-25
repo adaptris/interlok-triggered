@@ -10,11 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-
 import com.adaptris.core.Adapter;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumer;
@@ -31,6 +29,7 @@ import com.adaptris.core.ExampleChannelCase;
 import com.adaptris.core.PollingTrigger;
 import com.adaptris.core.StandaloneProducer;
 import com.adaptris.core.StandardWorkflow;
+import com.adaptris.core.StaticPollingTemplate;
 import com.adaptris.core.Workflow;
 import com.adaptris.core.XStreamMarshaller;
 import com.adaptris.core.fs.FsConsumer;
@@ -229,7 +228,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     PollingTrigger pt = new PollingTrigger();
     pt.setDestination(new ConfiguredConsumeDestination("Trigger"));
     pt.setPoller(new OneTimePoller());
-    pt.setTemplate("The quick brown fox");
+    pt.setMessageProvider(new StaticPollingTemplate("The quick brown fox"));
     triggeredWorkflow.setConsumer(pt);
     triggeredWorkflow.setProducer(triggeredProducer);
     triggeredWorkflow.setUniqueId("TriggeredWorkflow");
