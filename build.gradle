@@ -8,7 +8,7 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '4.0.1'
-  id 'com.github.spotbugs' version '1.6.10'
+  id 'com.github.spotbugs' version '3.0.0'
 }
 
 ext {
@@ -65,6 +65,24 @@ ext.hasGraphViz = { ->
   }
 }
 
+ext.gitBranchNameOrTimestamp = { branchName ->
+  if (branchName.equals("HEAD") || branchName.equals("develop") || branchName.startsWith("release")) {
+    return new Date().format('HH:mm:ss z');
+  }
+  return branchName;
+}
+
+ext.buildInfo = { ->
+   new ByteArrayOutputStream().withStream { os ->
+      exec {
+        executable = "git"
+        args = ["rev-parse", "--abbrev-ref", "HEAD"]
+        standardOutput = os
+      }
+      def branchName = os.toString().replaceAll("\r", "").replaceAll("\n", "").trim();
+      return gitBranchNameOrTimestamp(branchName);
+    }
+}
 
 sourceCompatibility = 1.8
 group   = 'com.adaptris'
@@ -174,6 +192,7 @@ task generateVersion {
       entry(key: 'artifactId', value: project.name)
       entry(key: 'build.version', value: project.version)
       entry(key: 'build.date', value: new Date().format('yyyy-MM-dd'))
+      entry(key: 'build.info', value: buildInfo())
     }
   }
 }
@@ -239,10 +258,6 @@ task umlJavadoc(type: Javadoc) {
   }
 }
 
-
-jacoco {
-  toolVersion="0.8.1"
-}
 
 jacocoTestReport {
     reports {
