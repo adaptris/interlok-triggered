@@ -6,6 +6,8 @@
  */
 package com.adaptris.core.triggered;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
+import org.junit.Before;
+import org.junit.Test;
 import com.adaptris.core.Adapter;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumer;
@@ -51,12 +55,12 @@ public class TriggeredChannelTest extends ExampleChannelCase {
   private String triggeredWorkflowKey;
   private MockEventHandlerWithState adapterEventHandler;
 
-  public TriggeredChannelTest(java.lang.String testName) {
-    super(testName);
-  }
-
   @Override
-  protected void setUp() throws Exception {
+  public boolean isAnnotatedForJunit4() {
+    return true;
+  }
+  @Before
+  public void setUp() throws Exception {
     adapterEventHandler = new MockEventHandlerWithState("AdapterEventHandler");
     adapter = new Adapter();
     adapter.setEventHandler(adapterEventHandler);
@@ -65,6 +69,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     adapter.getChannelList().addChannel(channel);
   }
 
+  @Test
   public void testJmxTrigger() throws Exception {
     JmxConsumer jmx = new JmxConsumer(new ConfiguredConsumeDestination("testJmxTrigger"));
     channel.getTrigger().setConsumer(jmx);
@@ -94,6 +99,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     adapter.requestClose();
   }
 
+  @Test
   public void testTrigger() throws Exception {
     adapter.requestStart();
     StandardWorkflow twf = findWorkflow(channel.getWorkflowList().getWorkflows(), triggeredWorkflowKey);
@@ -118,6 +124,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     adapter.requestClose();
   }
 
+  @Test
   public void testTriggerWithFailure() throws Exception {
     LifecycleHelper.initAndStart(adapter);
     LifecycleHelper.stopAndClose(adapter);

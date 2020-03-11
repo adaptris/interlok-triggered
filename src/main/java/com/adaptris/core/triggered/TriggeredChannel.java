@@ -60,9 +60,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * completed by the component or not. This ensures that the channel is not stopped prior to any messages that need to be retried
  * from being retried, thus failing the messages before their time.
  * </p>
- * 
+ *
  * @config triggered-channel
- * 
+ *
  * @license STANDARD
  * @see OneTimePoller
  * @see AdaptrisPollingConsumer
@@ -164,7 +164,7 @@ public final class TriggeredChannel extends Channel implements
    *
    * @see AdaptrisMessageListener#onAdaptrisMessage(AdaptrisMessage)
    */
-  public synchronized void onAdaptrisMessage(AdaptrisMessage msg) {
+  public synchronized void onAdaptrisMessage(AdaptrisMessage msg, java.util.function.Consumer<AdaptrisMessage> onSuccess) {
     List<Thread> threads = new ArrayList<Thread>();
     // Capture the last Starttime (because we stop/close).
     Date lastStartTime = lastStartTime();
@@ -322,5 +322,5 @@ public final class TriggeredChannel extends Channel implements
     }
   }
 
-  
+
 }

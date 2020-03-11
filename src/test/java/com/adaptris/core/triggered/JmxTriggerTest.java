@@ -6,11 +6,13 @@
  */
 package com.adaptris.core.triggered;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-
+import org.junit.Test;
 import com.adaptris.core.BaseCase;
 import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.CoreException;
@@ -18,15 +20,11 @@ import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
 
 public class JmxTriggerTest extends BaseCase {
-
-  public JmxTriggerTest(java.lang.String testName) {
-    super(testName);
-  }
-
   @Override
-  protected void setUp() throws Exception {
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
+  @Test
   public void testStart() throws Exception {
     MockMessageListener stub = new MockMessageListener();
     JmxConsumer jmx = new JmxConsumer(new ConfiguredConsumeDestination("testJmxTrigger"));
@@ -43,6 +41,7 @@ public class JmxTriggerTest extends BaseCase {
     }
   }
 
+  @Test
   public void testUnavailableWhenStopped() throws Exception {
     MockMessageListener stub = new MockMessageListener();
     JmxConsumer jmx = new JmxConsumer(new ConfiguredConsumeDestination("testJmxTrigger"));
@@ -68,6 +67,7 @@ public class JmxTriggerTest extends BaseCase {
     }
   }
 
+  @Test
   public void testInit() throws Exception {
     MockMessageListener stub = new MockMessageListener();
     JmxConsumer jmx = new JmxConsumer();
