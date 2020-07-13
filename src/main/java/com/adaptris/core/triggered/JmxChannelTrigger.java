@@ -1,7 +1,6 @@
 package com.adaptris.core.triggered;
 
 import static com.adaptris.core.AdaptrisMessageFactory.defaultIfNull;
-
 import com.adaptris.core.AdaptrisMessage;
 
 /**
@@ -25,7 +24,7 @@ public class JmxChannelTrigger implements JmxChannelTriggerMBean {
     String oldName = Thread.currentThread().getName();
 
     try {
-      Thread.currentThread().setName(owner.threadName());
+      Thread.currentThread().setName(owner.newThreadName());
       AdaptrisMessage msg = defaultIfNull(owner.getMessageFactory()).newMessage();
       owner.retrieveAdaptrisMessageListener().onAdaptrisMessage(msg);
     }

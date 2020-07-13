@@ -25,7 +25,6 @@ import com.adaptris.core.AdaptrisMessageProducer;
 import com.adaptris.core.ChannelList;
 import com.adaptris.core.ClosedState;
 import com.adaptris.core.ComponentState;
-import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultEventHandler;
@@ -71,7 +70,8 @@ public class TriggeredChannelTest extends ExampleChannelCase {
 
   @Test
   public void testJmxTrigger() throws Exception {
-    JmxConsumer jmx = new JmxConsumer(new ConfiguredConsumeDestination("testJmxTrigger"));
+    JmxConsumer jmx = new JmxConsumer();
+    jmx.setUniqueId("testJmxTrigger");
     channel.getTrigger().setConsumer(jmx);
     adapter.requestStart();
     StandardWorkflow twf = findWorkflow(channel.getWorkflowList().getWorkflows(), triggeredWorkflowKey);
@@ -185,11 +185,9 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     PtpProducer ptp = new PtpProducer();
     ptp.setDestination(new ConfiguredProduceDestination("dest"));
     ep.setProducer(ptp);
-    ConfiguredConsumeDestination ccd = new ConfiguredConsumeDestination();
-    ccd.setDestination("file:./fs/in");
     FsConsumer fsc = new FsConsumer();
     fsc.setPoller(new OneTimePoller());
-    fsc.setDestination(ccd);
+    fsc.setBaseDirectoryUrl("file:./fs/in");
     wf.setConsumer(fsc);
     wf.getServiceCollection().addService(ep);
     return wf;
@@ -197,7 +195,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
 
   private Trigger createTriggerForConfig() {
     JmxConsumer jmxConsumer = new JmxConsumer();
-    jmxConsumer.setDestination(new ConfiguredConsumeDestination("jmx_trigger"));
+    jmxConsumer.setUniqueId("jmx_trigger");
     Trigger t = new Trigger();
     t.setConsumer(jmxConsumer);
     return t;
@@ -233,7 +231,6 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     MockMessageProducer triggeredProducer = new MockMessageProducer();
     StandardWorkflow triggeredWorkflow = new StandardWorkflow();
     PollingTrigger pt = new PollingTrigger();
-    pt.setDestination(new ConfiguredConsumeDestination("Trigger"));
     pt.setPoller(new OneTimePoller());
     pt.setMessageProvider(new StaticPollingTemplate("The quick brown fox"));
     triggeredWorkflow.setConsumer(pt);

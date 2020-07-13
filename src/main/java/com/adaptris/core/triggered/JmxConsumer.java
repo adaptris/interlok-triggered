@@ -3,7 +3,8 @@ package com.adaptris.core.triggered;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-
+import javax.validation.Valid;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
@@ -11,39 +12,52 @@ import com.adaptris.core.licensing.License;
 import com.adaptris.core.licensing.License.LicenseType;
 import com.adaptris.core.licensing.LicenseChecker;
 import com.adaptris.core.licensing.LicensedComponent;
+import com.adaptris.core.util.DestinationHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Consumer type that can fires based on a JMX invocation.
- * 
+ *
  * <p>
  * The destination returned by {@link ConsumeDestination} is used as part of the {@link ObjectName}
  * </p>
- * 
+ *
  * @config triggered-jmx-consumer
- * 
+ *
  * @license STANDARD
  * @author lchan
- * 
+ *
  */
 @XStreamAlias("triggered-jmx-consumer")
+@NoArgsConstructor
 public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedComponent {
 
   public static final String JMX_OBJECT_NAME_PREFIX = "Adaptris:type=TriggeredChannel, uid=";
+  /**
+   * The consume destination is used to build up the JMX object name.
+   *
+   */
+  @Deprecated
+  @Valid
+  @Removal(version = "4.0.0", message = "use the 'unique-id' instead")
+  @Getter
+  @Setter
+  private ConsumeDestination destination;
 
   private transient String jmxUid = null;
-
-  public JmxConsumer() {
-    super();
-  }
-
-  public JmxConsumer(ConsumeDestination d) {
-    this();
-    setDestination(d);
-  }
+  private transient boolean destinationWarningLogged;
 
   @Override
   public void prepare() throws CoreException {
+    DestinationHelper.logConsumeDestinationWarning(destinationWarningLogged,
+        () -> destinationWarningLogged = true, getDestination(),
+        "{} uses destination, remove it and default to the unique-id instead",
+        LoggingHelper.friendlyName(this));
+    DestinationHelper.mustHaveEither(getUniqueId(), getDestination());
     LicenseChecker.newChecker().checkLicense(this);
   }
 
@@ -66,13 +80,8 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
     }
   }
 
-  private String getJmxUid() throws CoreException {
-    if (getDestination() != null) {
-      return getDestination().getDestination();
-    }
-    else {
-      throw new CoreException("No Destination configured");
-    }
+  private String getJmxUid() {
+    return DestinationHelper.consumeDestination(getUniqueId(), getDestination());
   }
 
   @Override
@@ -110,7 +119,8 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
     }
   }
 
-  String threadName() {
-    return retrieveAdaptrisMessageListener().friendlyName();
+  @Override
+  protected String newThreadName() {
+    return DestinationHelper.threadName(retrieveAdaptrisMessageListener(), getDestination());
   }
 }
