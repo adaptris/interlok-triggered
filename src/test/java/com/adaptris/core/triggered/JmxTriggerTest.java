@@ -14,8 +14,6 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import org.junit.Test;
 import com.adaptris.core.BaseCase;
-import com.adaptris.core.ConfiguredConsumeDestination;
-import com.adaptris.core.CoreException;
 import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
 
@@ -27,7 +25,8 @@ public class JmxTriggerTest extends BaseCase {
   @Test
   public void testStart() throws Exception {
     MockMessageListener stub = new MockMessageListener();
-    JmxConsumer jmx = new JmxConsumer(new ConfiguredConsumeDestination("testJmxTrigger"));
+    JmxConsumer jmx = new JmxConsumer();
+    jmx.setUniqueId("testJmxTrigger");
     jmx.registerAdaptrisMessageListener(stub);
     try {
       start(jmx);
@@ -44,7 +43,8 @@ public class JmxTriggerTest extends BaseCase {
   @Test
   public void testUnavailableWhenStopped() throws Exception {
     MockMessageListener stub = new MockMessageListener();
-    JmxConsumer jmx = new JmxConsumer(new ConfiguredConsumeDestination("testJmxTrigger"));
+    JmxConsumer jmx = new JmxConsumer();
+    jmx.setUniqueId("testJmxTrigger");
     jmx.registerAdaptrisMessageListener(stub);
     try {
       start(jmx);
@@ -68,20 +68,18 @@ public class JmxTriggerTest extends BaseCase {
   }
 
   @Test
-  public void testInit() throws Exception {
+  public void testLifecycle() throws Exception {
     MockMessageListener stub = new MockMessageListener();
     JmxConsumer jmx = new JmxConsumer();
     jmx.registerAdaptrisMessageListener(stub);
-    LifecycleHelper.init(jmx);
     try {
-      LifecycleHelper.start(jmx);
-      fail("Started with no consume Destination");
-    }
-    catch (CoreException expected) {
-
+      LifecycleHelper.initAndStart(jmx);
+      fail();
+    } catch (Exception expected) {
+      // had no unique-id
     }
     finally {
-      LifecycleHelper.close(jmx);
+      LifecycleHelper.stopAndClose(jmx);
     }
   }
 

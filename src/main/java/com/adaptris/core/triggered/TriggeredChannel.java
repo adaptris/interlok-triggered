@@ -5,10 +5,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
+import java.util.function.Consumer;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
@@ -160,11 +159,12 @@ public final class TriggeredChannel extends Channel implements
     return license.isEnabled(LicenseType.Standard);
   }
 
-  /**
-   *
-   * @see AdaptrisMessageListener#onAdaptrisMessage(AdaptrisMessage)
-   */
-  public synchronized void onAdaptrisMessage(AdaptrisMessage msg, java.util.function.Consumer<AdaptrisMessage> onSuccess) {
+
+  // Trigger doesn't care about onSuccess / onFailure, it's job is just to start workflows when it
+  // receives a msg.
+  @Override
+  public void onAdaptrisMessage(AdaptrisMessage msg, Consumer<AdaptrisMessage> onSuccess,
+      Consumer<AdaptrisMessage> onFailure) {
     List<Thread> threads = new ArrayList<Thread>();
     // Capture the last Starttime (because we stop/close).
     Date lastStartTime = lastStartTime();
@@ -179,7 +179,7 @@ public final class TriggeredChannel extends Channel implements
       LifecycleHelper.start(getConsumeConnection());
       for (Iterator<Workflow> i = getWorkflowList().getWorkflows().iterator(); i
           .hasNext();) {
-        WorkflowStarter wfs = new WorkflowStarter((Workflow) i.next());
+        WorkflowStarter wfs = new WorkflowStarter(i.next());
         Thread t = new Thread(wfs);
         t.setName(wfs.createFriendlyThreadName());
         threads.add(t);
@@ -302,6 +302,7 @@ public final class TriggeredChannel extends Channel implements
       workflow = w;
     }
 
+    @Override
     public void run() {
       try {
         LifecycleHelper.start(workflow);
