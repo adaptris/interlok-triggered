@@ -4,7 +4,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.validation.Valid;
-import com.adaptris.annotation.Removal;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
@@ -43,7 +43,7 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
    */
   @Deprecated
   @Valid
-  @Removal(version = "4.0.0", message = "use the 'unique-id' instead")
+  @ConfigDeprecated(removalVersion = "4.0.0", message = "use the 'unique-id' instead", groups = Deprecated.class)
   @Getter
   @Setter
   private ConsumeDestination destination;
