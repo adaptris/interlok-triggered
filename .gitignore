@@ -26,6 +26,7 @@ log4j.properties
 *.orig
 target
 bin
+.gradle
 gradle.properties
 unit-tests.properties
 src/main/generated
