@@ -8,15 +8,15 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '4.0.1'
-  id 'com.github.spotbugs' version '4.5.1'
-  id 'org.owasp.dependencycheck' version '6.0.3'
+  id 'com.github.spotbugs' version '4.6.0'
+  id 'org.owasp.dependencycheck' version '6.0.5'
   id "io.freefair.lombok" version "5.3.0"
 
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.11-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.11-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.12-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.12-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -87,7 +87,8 @@ ext.buildInfo = { ->
     }
 }
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
@@ -152,8 +153,8 @@ dependencies {
   }
   testCompile ("com.adaptris:interlok-varsub:$interlokCoreVersion") { changing= true}
   testCompile ("com.adaptris:interlok-licensing-stub:$interlokCoreVersion") { changing= true}
-  testCompile ("org.mockito:mockito-core:3.6.0")
-  testCompile ("org.mockito:mockito-inline:3.6.0")
+  testCompile ("org.mockito:mockito-core:3.7.0")
+  testCompile ("org.mockito:mockito-inline:3.7.0")
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
