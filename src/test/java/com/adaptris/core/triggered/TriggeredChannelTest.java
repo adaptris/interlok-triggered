@@ -182,8 +182,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     wf.setUniqueId(UUID.randomUUID().toString());
     StandaloneProducer ep = new StandaloneProducer();
     ep.setConnection(new JmsConnection(new StandardJndiImplementation("MyJndiName")));
-    PtpProducer ptp = new PtpProducer();
-    ptp.setDestination(new ConfiguredProduceDestination("dest"));
+    PtpProducer ptp = new PtpProducer().withQueue("dest");
     ep.setProducer(ptp);
     FsConsumer fsc = new FsConsumer();
     fsc.setPoller(new OneTimePoller());
