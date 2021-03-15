@@ -25,7 +25,6 @@ import com.adaptris.core.AdaptrisMessageProducer;
 import com.adaptris.core.ChannelList;
 import com.adaptris.core.ClosedState;
 import com.adaptris.core.ComponentState;
-import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultEventHandler;
 import com.adaptris.core.ExampleChannelCase;
