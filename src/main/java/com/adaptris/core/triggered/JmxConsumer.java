@@ -3,27 +3,26 @@ package com.adaptris.core.triggered;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-import javax.validation.Valid;
-import com.adaptris.validation.constraints.ConfigDeprecated;
+
+import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
-import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.licensing.License;
 import com.adaptris.core.licensing.License.LicenseType;
 import com.adaptris.core.licensing.LicenseChecker;
 import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.DestinationHelper;
-import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.interlok.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import lombok.Getter;
+
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Consumer type that can fires based on a JMX invocation.
  *
  * <p>
- * The destination returned by {@link ConsumeDestination} is used as part of the {@link ObjectName}
+ * The unique id is used as part of the {@link ObjectName} {@value #JMX_OBJECT_NAME_PREFIX}
  * </p>
  *
  * @config triggered-jmx-consumer
@@ -33,31 +32,17 @@ import lombok.Setter;
  *
  */
 @XStreamAlias("triggered-jmx-consumer")
+@AdapterComponent
+@ComponentProfile(summary = "Consumer type that can fires based on a JMX invocation", tag = "consumer,jmx,triggered")
 @NoArgsConstructor
 public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedComponent {
 
   public static final String JMX_OBJECT_NAME_PREFIX = "Adaptris:type=TriggeredChannel, uid=";
-  /**
-   * The consume destination is used to build up the JMX object name.
-   *
-   */
-  @Deprecated
-  @Valid
-  @ConfigDeprecated(removalVersion = "4.0.0", message = "use the 'unique-id' instead", groups = Deprecated.class)
-  @Getter
-  @Setter
-  private ConsumeDestination destination;
-
-  private transient String jmxUid = null;
-  private transient boolean destinationWarningLogged;
 
   @Override
   public void prepare() throws CoreException {
-    DestinationHelper.logConsumeDestinationWarning(destinationWarningLogged,
-        () -> destinationWarningLogged = true, getDestination(),
-        "{} uses destination, remove it and default to the unique-id instead",
-        LoggingHelper.friendlyName(this));
-    DestinationHelper.mustHaveEither(getUniqueId(), getDestination());
+    Args.notNull(getUniqueId(), "unique-id");
+
     LicenseChecker.newChecker().checkLicense(this);
   }
 
@@ -68,7 +53,6 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
 
   @Override
   public void close() {
-
   }
 
   private MBeanServer getMBeanServer() {
@@ -81,12 +65,11 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
   }
 
   private String getJmxUid() {
-    return DestinationHelper.consumeDestination(getUniqueId(), getDestination());
+    return getUniqueId();
   }
 
   @Override
   public void init() throws CoreException {
-
   }
 
   @Override
@@ -97,12 +80,10 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
 
       ObjectName adapterName = ObjectName.getInstance(JMX_OBJECT_NAME_PREFIX + getJmxUid());
       mBeanServer.registerMBean(new JmxChannelTrigger(this), adapterName);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       if (e instanceof CoreException) {
         throw (CoreException) e;
-      }
-      else {
+      } else {
         throw new CoreException(e);
       }
     }
@@ -113,14 +94,13 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
     MBeanServer mBeanServer = getMBeanServer();
     try {
       mBeanServer.unregisterMBean(ObjectName.getInstance(JMX_OBJECT_NAME_PREFIX + getJmxUid()));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       ;
     }
   }
 
   @Override
   protected String newThreadName() {
-    return DestinationHelper.threadName(retrieveAdaptrisMessageListener(), getDestination());
+    return DestinationHelper.threadName(retrieveAdaptrisMessageListener());
   }
 }

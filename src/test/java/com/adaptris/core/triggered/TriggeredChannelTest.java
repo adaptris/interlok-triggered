@@ -8,15 +8,19 @@ package com.adaptris.core.triggered;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import com.adaptris.core.Adapter;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumer;
@@ -25,10 +29,8 @@ import com.adaptris.core.AdaptrisMessageProducer;
 import com.adaptris.core.ChannelList;
 import com.adaptris.core.ClosedState;
 import com.adaptris.core.ComponentState;
-import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultEventHandler;
-import com.adaptris.core.ExampleChannelCase;
 import com.adaptris.core.PollingTrigger;
 import com.adaptris.core.StandaloneProducer;
 import com.adaptris.core.StandardWorkflow;
@@ -44,6 +46,7 @@ import com.adaptris.core.stubs.MockEventHandlerWithState;
 import com.adaptris.core.stubs.MockMessageConsumer;
 import com.adaptris.core.stubs.MockMessageProducer;
 import com.adaptris.core.util.LifecycleHelper;
+import com.adaptris.interlok.junit.scaffolding.ExampleChannelCase;
 import com.adaptris.util.GuidGenerator;
 import com.adaptris.util.TimeInterval;
 
@@ -54,10 +57,6 @@ public class TriggeredChannelTest extends ExampleChannelCase {
   private String triggeredWorkflowKey;
   private MockEventHandlerWithState adapterEventHandler;
 
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
   @Before
   public void setUp() throws Exception {
     adapterEventHandler = new MockEventHandlerWithState("AdapterEventHandler");
@@ -144,17 +143,17 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     LifecycleHelper.stopAndClose(adapter);
   }
 
-  private void assertWorkflowState(List l, ComponentState state) {
-    for (Iterator i = l.iterator(); i.hasNext();) {
-      StandardWorkflow wf = (StandardWorkflow) i.next();
+  private void assertWorkflowState(List<Workflow> l, ComponentState state) {
+    for (Iterator<Workflow> i = l.iterator(); i.hasNext();) {
+      Workflow wf = i.next();
       assertEquals("State of workflow " + wf.obtainWorkflowId(), state, wf.retrieveComponentState());
     }
   }
 
-  private void checkMessagePayloads(List l) {
-    for (Iterator i = l.iterator(); i.hasNext();) {
-      AdaptrisMessage m = (AdaptrisMessage) i.next();
-      assertEquals("The quick brown fox", m.getStringPayload());
+  private void checkMessagePayloads(List<AdaptrisMessage> l) {
+    for (Iterator<AdaptrisMessage> i = l.iterator(); i.hasNext();) {
+      AdaptrisMessage m = i.next();
+      assertEquals("The quick brown fox", m.getContent());
     }
   }
 
@@ -238,10 +237,10 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     return triggeredWorkflow;
   }
 
-  private StandardWorkflow findWorkflow(List l, String key) {
+  private StandardWorkflow findWorkflow(List<Workflow> l, String key) {
     StandardWorkflow result = null;
 
-    for (Iterator i = l.iterator(); i.hasNext();) {
+    for (Iterator<Workflow> i = l.iterator(); i.hasNext();) {
       StandardWorkflow w = (StandardWorkflow) i.next();
       if (key.equals(w.obtainWorkflowId())) {
         result = w;

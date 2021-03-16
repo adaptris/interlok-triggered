@@ -9,6 +9,8 @@ package com.adaptris.core.triggered;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.AdaptrisMessageProducer;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NullConnection;
@@ -24,14 +26,16 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Component that triggers an instance of TriggeredChannel
- * 
+ *
  * @config trigger
- * 
+ *
  * @license STANDARD
  * @author lchan
  * @author $Author: lchan $
  */
 @XStreamAlias("trigger")
+@AdapterComponent
+@ComponentProfile(summary = "Standalone wrapper for a consumer and connection and is intended for use within a TriggeredChannel", tag = "consumer,triggered")
 public class Trigger extends StandaloneConsumer implements LicensedComponent {
 
   @NotNull

@@ -8,20 +8,20 @@ package com.adaptris.core.triggered;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
+
 import org.junit.Test;
-import com.adaptris.core.BaseCase;
+
 import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
+import com.adaptris.interlok.junit.scaffolding.BaseCase;
 
 public class JmxTriggerTest extends BaseCase {
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+
   @Test
   public void testStart() throws Exception {
     MockMessageListener stub = new MockMessageListener();
@@ -34,8 +34,7 @@ public class JmxTriggerTest extends BaseCase {
       ObjectName jmxTrigger = ObjectName.getInstance(JmxConsumer.JMX_OBJECT_NAME_PREFIX + "testJmxTrigger");
       server.invoke(jmxTrigger, JmxChannelTrigger.TRIGGER_OPERATION, null, null);
       assertEquals(1, stub.getMessages().size());
-    }
-    finally {
+    } finally {
       stop(jmx);
     }
   }
@@ -56,13 +55,11 @@ public class JmxTriggerTest extends BaseCase {
         stop(jmx);
         server.invoke(jmxTrigger, JmxChannelTrigger.TRIGGER_OPERATION, null, null);
         fail("success unexpected");
-      }
-      catch (InstanceNotFoundException expected) {
+      } catch (InstanceNotFoundException expected) {
 
       }
       assertEquals(1, stub.getMessages().size());
-    }
-    finally {
+    } finally {
       stop(jmx);
     }
   }
@@ -77,8 +74,7 @@ public class JmxTriggerTest extends BaseCase {
       fail();
     } catch (Exception expected) {
       // had no unique-id
-    }
-    finally {
+    } finally {
       LifecycleHelper.stopAndClose(jmx);
     }
   }
@@ -87,8 +83,7 @@ public class JmxTriggerTest extends BaseCase {
     MBeanServer server = null;
     if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
       server = MBeanServerFactory.findMBeanServer(null).get(0);
-    }
-    else {
+    } else {
       fail("No JMX mbeanServer.");
     }
     return server;

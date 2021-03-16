@@ -6,9 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.AdaptrisMessageListener;
@@ -70,8 +74,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author $Author: lchan $
  */
 @XStreamAlias("triggered-channel")
+@AdapterComponent
+@ComponentProfile(summary = "A Channel whose lifecycle is determined by an external configurable trigger", tag = "triggered")
 public final class TriggeredChannel extends Channel implements
- AdaptrisMessageListener, LicensedComponent {
+AdaptrisMessageListener, LicensedComponent {
 
   @NotNull
   @Valid
@@ -165,7 +171,7 @@ public final class TriggeredChannel extends Channel implements
   @Override
   public void onAdaptrisMessage(AdaptrisMessage msg, Consumer<AdaptrisMessage> onSuccess,
       Consumer<AdaptrisMessage> onFailure) {
-    List<Thread> threads = new ArrayList<Thread>();
+    List<Thread> threads = new ArrayList<>();
     // Capture the last Starttime (because we stop/close).
     Date lastStartTime = lastStartTime();
     Date lastStopTime = lastStopTime();
@@ -248,15 +254,6 @@ public final class TriggeredChannel extends Channel implements
    */
   public void setTrigger(Trigger t) {
     trigger = t;
-  }
-
-  private static String getFriendlyClassName() {
-    String className = TriggeredChannel.class.getName();
-    int dot = className.lastIndexOf(".");
-    if (dot > 0) {
-      className = className.substring(dot + 1);
-    }
-    return className;
   }
 
   /**
