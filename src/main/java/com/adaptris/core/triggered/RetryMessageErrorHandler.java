@@ -9,6 +9,9 @@ package com.adaptris.core.triggered;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.RetryMessageErrorHandlerImp;
 import com.adaptris.util.TimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -16,10 +19,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 /**
  * MessageErrorHandler implementation that allows automatic retries for a problem message and is intended for use within a
  * TriggeredChannel
- * 
+ *
  * @config triggered-retry-message-error-handler
  */
 @XStreamAlias("triggered-retry-message-error-handler")
+@AdapterComponent
+@ComponentProfile(summary = "An exception handler instance that allows automated retries and is intended for use within a TriggeredChannel", tag = "error-handling,triggered")
+@DisplayOrder(order = { "retryLimit" })
 public class RetryMessageErrorHandler extends RetryMessageErrorHandlerImp implements TriggeredProcessor {
 
   /**
@@ -44,13 +50,13 @@ public class RetryMessageErrorHandler extends RetryMessageErrorHandlerImp implem
    */
   @Override
   public boolean processingCompleted() {
-    return (assertEmpty(retryList, inProgress)) || executorShutdown();
+    return assertEmpty(retryList, inProgress) || executorShutdown();
   }
 
-  private boolean assertEmpty(List... lists) {
+  private boolean assertEmpty(List<?>... lists) {
     int rc = 0;
-    for (List list : lists) {
-      rc += list.size() == 0 ? 1 : 0;
+    for (List<?> list : lists) {
+      rc += list.isEmpty() ? 1 : 0;
     }
     return rc == lists.length;
   }
