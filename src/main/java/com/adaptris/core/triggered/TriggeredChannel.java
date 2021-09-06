@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import javax.validation.Valid;
@@ -219,7 +219,7 @@ AdaptrisMessageListener, LicensedComponent {
     TriggeredProcessor t = (TriggeredProcessor) retrieveActiveMsgErrorHandler();
     while (!t.processingCompleted()) {
       try {
-        Thread.sleep(new Random().nextInt(1000));
+        Thread.sleep(ThreadLocalRandom.current().nextInt(1000));
       }
       catch (InterruptedException e) {
         ;
