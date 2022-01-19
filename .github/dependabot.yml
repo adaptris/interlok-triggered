@@ -17,7 +17,6 @@ updates:
     allow:
       - dependency-type: "all"
     reviewers:
-      - quotidian-ennui
       - mcwarman
       - aaron-mcgrath-adp
       - sebastien-belin-adp
