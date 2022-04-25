@@ -41,4 +41,4 @@ jobs:
         ORG_GRADLE_PROJECT_repoUsername: developer
         ORG_GRADLE_PROJECT_repoPassword: ${{ secrets.NEXUS_REPO_PASSWORD }}
     - name: codecov.io
-      uses: codecov/codecov-action@v3.0.0
+      uses: codecov/codecov-action@v3.1.0
