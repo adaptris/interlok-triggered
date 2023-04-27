@@ -13,7 +13,7 @@ updates:
     registries:
       - "interlok"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     allow:
       - dependency-type: "all"
     reviewers:

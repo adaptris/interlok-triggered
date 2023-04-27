@@ -13,3 +13,5 @@ jobs:
     uses: interlok-tooling/reusable-workflows/.github/workflows/gradle-check.yml@main
     secrets:
       NEXUS_REPO_PASSWORD: ${{ secrets.NEXUS_REPO_PASSWORD }}
+    with:
+      disable-dependency-check: true
