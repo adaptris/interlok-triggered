@@ -5,7 +5,8 @@ on:
     branches:
     - develop
   schedule:
-    - cron: 0 3 * * * # Daily 3 a.m.
+#   - cron: 0 3 * * * # Daily 3 a.m.
+    - cron: 0 3 * * MON,THU # Monday and Thursday 3 a.m.
 
 permissions: read-all
 
