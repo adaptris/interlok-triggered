@@ -17,8 +17,7 @@ import com.adaptris.util.TimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * MessageErrorHandler implementation that allows automatic retries for a problem message and is intended for use within a
- * TriggeredChannel
+ * MessageErrorHandler implementation that allows automatic retries for a problem message and is intended for use within a TriggeredChannel
  *
  * @config triggered-retry-message-error-handler
  */
@@ -64,4 +63,5 @@ public class RetryMessageErrorHandler extends RetryMessageErrorHandlerImp implem
   private boolean executorShutdown() {
     return executor != null ? executor.isShutdown() : true;
   }
+
 }
