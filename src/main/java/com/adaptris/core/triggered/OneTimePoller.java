@@ -18,7 +18,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * <p>
  * Implementation of <code>Poller</code> which only polls once upon start and never again.
  * </p>
- * 
+ *
  * @config triggered-one-time-poller
  * @license STANDARD
  */

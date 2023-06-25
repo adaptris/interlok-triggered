@@ -2,7 +2,6 @@ package com.adaptris.core.triggered;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
@@ -37,31 +36,31 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 /**
  * A Channel whose lifecycle is determined by an external configurable trigger.
  * <p>
- * Workflows configured as part of a TriggeredChannel do not participate in the normal adapter lifecycle until such time as its
- * trigger consumer consumes a message. At that point, the underlying connections and workflows are initialised, and started.
+ * Workflows configured as part of a TriggeredChannel do not participate in the normal adapter lifecycle until such time as its trigger
+ * consumer consumes a message. At that point, the underlying connections and workflows are initialised, and started.
  * </p>
  * <p>
- * After starting the workflows, the channel blocks and waits for the workflows to terminate, so that it can accept the next
- * trigger. As a result of this behaviour, it only makes sense for the workflows to contain consumers that actively poll the
- * back-end system such as {@link AdaptrisPollingConsumer}, rather than consumers that passively wait for activity. Failure to
- * follow these guidelines may lead to undefined behaviour.
+ * After starting the workflows, the channel blocks and waits for the workflows to terminate, so that it can accept the next trigger. As a
+ * result of this behaviour, it only makes sense for the workflows to contain consumers that actively poll the back-end system such as
+ * {@link AdaptrisPollingConsumer}, rather than consumers that passively wait for activity. Failure to follow these guidelines may lead to
+ * undefined behaviour.
  * </p>
  * <p>
- * Even when using an {@link AdaptrisPollingConsumer} implementation the {@link com.adaptris.core.Poller} mechanism that should be
- * used should have a finite lifespan such as {@link OneTimePoller} so that the workflows terminate as expected. If you opt not to
- * use a poller with a finite lifespan then behaviour may be undefined.
+ * Even when using an {@link AdaptrisPollingConsumer} implementation the {@link com.adaptris.core.Poller} mechanism that should be used
+ * should have a finite lifespan such as {@link OneTimePoller} so that the workflows terminate as expected. If you opt not to use a poller
+ * with a finite lifespan then behaviour may be undefined.
  * </p>
  * <p>
  * This type of channel also handles errors and events differently. A specific EventHandler may be specified to physically handle
- * MessageLifecycleEvents that are created within the channel. If this is unspecified then the Adapter's EventHandler is used. The
- * rationale behind this behaviour is to treat events as standard AdaptrisMessage objects which then allows message error handling
- * logic to take place.
+ * MessageLifecycleEvents that are created within the channel. If this is unspecified then the Adapter's EventHandler is used. The rationale
+ * behind this behaviour is to treat events as standard AdaptrisMessage objects which then allows message error handling logic to take
+ * place.
  * </p>
  * <p>
- * Any {@link com.adaptris.core.ProcessingExceptionHandler} implementation that is used with this Channel implementation must also
- * implement the {@link TriggeredProcessor} interface, which simply allows this Channel to interrogate whether processing has been
- * completed by the component or not. This ensures that the channel is not stopped prior to any messages that need to be retried
- * from being retried, thus failing the messages before their time.
+ * Any {@link com.adaptris.core.ProcessingExceptionHandler} implementation that is used with this Channel implementation must also implement
+ * the {@link TriggeredProcessor} interface, which simply allows this Channel to interrogate whether processing has been completed by the
+ * component or not. This ensures that the channel is not stopped prior to any messages that need to be retried from being retried, thus
+ * failing the messages before their time.
  * </p>
  *
  * @config triggered-channel
@@ -76,8 +75,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("triggered-channel")
 @AdapterComponent
 @ComponentProfile(summary = "A Channel whose lifecycle is determined by an external configurable trigger", tag = "triggered")
-public final class TriggeredChannel extends Channel implements
-AdaptrisMessageListener, LicensedComponent {
+public final class TriggeredChannel extends Channel implements AdaptrisMessageListener, LicensedComponent {
 
   @NotNull
   @Valid
@@ -105,7 +103,6 @@ AdaptrisMessageListener, LicensedComponent {
     super.changeState(ClosedState.getInstance());
   }
 
-
   /**
    *
    * @see com.adaptris.core.ChannelList#init()
@@ -113,9 +110,8 @@ AdaptrisMessageListener, LicensedComponent {
   @Override
   public void init() throws CoreException {
     if (!(retrieveActiveMsgErrorHandler() instanceof TriggeredProcessor)) {
-      throw new CoreException("TriggeredChannel may only contain "
-          + TriggeredProcessor.class
-          + " implementations as its MessageErrorHandler");
+      throw new CoreException(
+          "TriggeredChannel may only contain " + TriggeredProcessor.class + " implementations as its MessageErrorHandler");
     }
     trigger.getConsumer().registerAdaptrisMessageListener(this);
     LifecycleHelper.init(trigger);
@@ -165,12 +161,10 @@ AdaptrisMessageListener, LicensedComponent {
     return license.isEnabled(LicenseType.Standard);
   }
 
-
   // Trigger doesn't care about onSuccess / onFailure, it's job is just to start workflows when it
   // receives a msg.
   @Override
-  public void onAdaptrisMessage(AdaptrisMessage msg, Consumer<AdaptrisMessage> onSuccess,
-      Consumer<AdaptrisMessage> onFailure) {
+  public void onAdaptrisMessage(AdaptrisMessage msg, Consumer<AdaptrisMessage> onSuccess, Consumer<AdaptrisMessage> onFailure) {
     List<Thread> threads = new ArrayList<>();
     // Capture the last Starttime (because we stop/close).
     Date lastStartTime = lastStartTime();
@@ -183,20 +177,17 @@ AdaptrisMessageListener, LicensedComponent {
       // It's valid to start the consume connection before the workflow
       // as the docs explicitly state you should be using a PollingConsumer.
       LifecycleHelper.start(getConsumeConnection());
-      for (Iterator<Workflow> i = getWorkflowList().getWorkflows().iterator(); i
-          .hasNext();) {
-        WorkflowStarter wfs = new WorkflowStarter(i.next());
+      for (Workflow workflow : getWorkflowList().getWorkflows()) {
+        WorkflowStarter wfs = new WorkflowStarter(workflow);
         Thread t = new Thread(wfs);
         t.setName(wfs.createFriendlyThreadName());
         threads.add(t);
         log.trace("Starting " + t.getName());
         t.start();
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
-    }
-    finally {
+    } finally {
       waitForThreads(threads);
       waitForErrorHandler();
       super.stop();
@@ -208,8 +199,7 @@ AdaptrisMessageListener, LicensedComponent {
     log.trace("Trigger processing complete");
     try {
       getTrigger().getProducer().produce(msg);
-    }
-    catch (ProduceException e) {
+    } catch (ProduceException e) {
       throw new RuntimeException(e);
     }
   }
@@ -220,9 +210,8 @@ AdaptrisMessageListener, LicensedComponent {
     while (!t.processingCompleted()) {
       try {
         Thread.sleep(ThreadLocalRandom.current().nextInt(1000));
-      }
-      catch (InterruptedException e) {
-        ;
+      } catch (InterruptedException e) {
+
       }
     }
   }
@@ -233,14 +222,12 @@ AdaptrisMessageListener, LicensedComponent {
       if (t.isAlive()) {
         try {
           t.join();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
       }
     }
   }
-
 
   /**
    * @return the triggerComponent
@@ -250,7 +237,8 @@ AdaptrisMessageListener, LicensedComponent {
   }
 
   /**
-   * @param t the triggerComponent
+   * @param t
+   *          the triggerComponent
    */
   public void setTrigger(Trigger t) {
     trigger = t;
@@ -266,7 +254,8 @@ AdaptrisMessageListener, LicensedComponent {
   /**
    * Set the message factory used when creating AdaptrisMessage.
    *
-   * @param f the messageFactory to set
+   * @param f
+   *          the messageFactory to set
    */
   public void setMessageFactory(AdaptrisMessageFactory f) {
     messageFactory = f;
@@ -280,7 +269,8 @@ AdaptrisMessageListener, LicensedComponent {
   }
 
   /**
-   * @param eh the eventHandlerForMessages to set
+   * @param eh
+   *          the eventHandlerForMessages to set
    */
   public void setEventHandlerForMessages(EventHandler eh) {
     eventHandlerForMessages = eh;
@@ -290,7 +280,6 @@ AdaptrisMessageListener, LicensedComponent {
   public String friendlyName() {
     return LoggingHelper.friendlyName(this);
   }
-
 
   private class WorkflowStarter implements Runnable {
     private Workflow workflow;
@@ -309,8 +298,7 @@ AdaptrisMessageListener, LicensedComponent {
             ((OneTimePoller) p).processMessages();
           }
         }
-      }
-      catch (CoreException e) {
+      } catch (CoreException e) {
         log.error("Failure to start workflow", e);
       }
     }
@@ -319,6 +307,5 @@ AdaptrisMessageListener, LicensedComponent {
       return workflow.friendlyName();
     }
   }
-
 
 }
