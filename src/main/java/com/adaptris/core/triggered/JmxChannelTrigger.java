@@ -1,11 +1,11 @@
 package com.adaptris.core.triggered;
 
 import static com.adaptris.core.AdaptrisMessageFactory.defaultIfNull;
+
 import com.adaptris.core.AdaptrisMessage;
 
 /**
- * Implementation of {@link JmxChannelTriggerMBean} that triggers the underlying
- * channel.
+ * Implementation of {@link JmxChannelTriggerMBean} that triggers the underlying channel.
  *
  * @author lchan
  *
@@ -27,8 +27,7 @@ public class JmxChannelTrigger implements JmxChannelTriggerMBean {
       Thread.currentThread().setName(owner.newThreadName());
       AdaptrisMessage msg = defaultIfNull(owner.getMessageFactory()).newMessage();
       owner.retrieveAdaptrisMessageListener().onAdaptrisMessage(msg);
-    }
-    finally {
+    } finally {
       Thread.currentThread().setName(oldName);
     }
   }

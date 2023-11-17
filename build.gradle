@@ -2,20 +2,19 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.*
 
 plugins {
-  id 'java-library'
-  id 'maven-publish'
-  id 'jacoco'
+  id "java-library"
+  id "maven-publish"
+  id "jacoco"
   // Manage optional dependencies in maven pom.
-  id 'nebula.optional-base' version '7.0.0'
-  id 'com.github.spotbugs' version '5.0.13'
-  id 'org.owasp.dependencycheck' version '8.1.2'
-  id "io.freefair.lombok" version "6.5.1"
-
+  id "nebula.optional-base" version "7.0.0"
+  id "com.github.spotbugs" version "5.2.1"
+  id "org.owasp.dependencycheck" version "8.4.2"
+  id "io.freefair.lombok" version "8.4"
 }
 
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.8-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.8-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '5.0-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '5.0-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -33,8 +32,8 @@ ext {
   componentDesc="Custom Channel implementation that can be externally triggered to start/stop"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.3'
-  mockitoVersion = '4.9.0'
+  slf4jVersion = '2.0.9'
+  mockitoVersion = '5.2.0'
 }
 
 ext.buildUtil = [
@@ -96,8 +95,8 @@ ext.buildUtil = [
 
 ]
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
@@ -164,9 +163,9 @@ dependencies {
   implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
-  umlDoclet("nl.talsmasoftware:umldoclet:1.0.16")
+  umlDoclet("nl.talsmasoftware:umldoclet:2.1.0")
 
-  testImplementation ('junit:junit:4.13.2')
+  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.10.1")
   testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
   testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
   testImplementation ("org.mockito:mockito-core:$mockitoVersion")
@@ -179,9 +178,7 @@ dependencies {
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-licensing:$interlokCoreVersion:javadoc@jar") { changing= true}
-
 }
-
 
 jar {
   manifest {
@@ -193,7 +190,6 @@ jar {
                "Implementation-Vendor": organizationName)
   }
 }
-
 
 sourceSets {
   main {
@@ -247,7 +243,6 @@ task offlinePackageList(type: Copy) {
   into offlineJavadocPackageDir
 }
 
-
 javadoc {
   onlyIf {
     !buildUtil.hasGraphViz()
@@ -259,8 +254,7 @@ javadoc {
     options.linksOffline(interlokLicenseJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-licensing-$interlokCoreVersion-javadoc.jar")
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addBooleanOption "-no-module-directories", true
+    options.addStringOption "Xdoclint:none", "-quiet"
     title= componentName
   }
 }
@@ -280,35 +274,24 @@ task umlJavadoc(type: Javadoc) {
     options.linksOffline(interlokLicenseJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-licensing-$interlokCoreVersion-javadoc.jar")
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addBooleanOption "-no-module-directories", true
+    options.addStringOption "Xdoclint:none", "-quiet"
     options.docletpath = configurations.umlDoclet.files.asType(List)
     options.doclet = "nl.talsmasoftware.umldoclet.UMLDoclet"
-    options.addStringOption "umlBasePath", destinationDir.getCanonicalPath()
+    // Create class & package use pages
+    options.addStringOption "use"    
     options.addStringOption "umlImageFormat", "SVG"
-    options.addStringOption "umlExcludedReferences", "java.lang.Exception,java.lang.Object,java.lang.Enum"
-    options.addStringOption "umlIncludePrivateClasses","false"
-    options.addStringOption "umlIncludePackagePrivateClasses","false"
-    options.addStringOption "umlIncludeProtectedClasses","false"
-    options.addStringOption "umlIncludeAbstractSuperclassMethods","false"
-    options.addStringOption "umlIncludeConstructors","false"
-    options.addStringOption "umlIncludePublicFields","false"
-    options.addStringOption "umlIncludePackagePrivateFields","false"
-    options.addStringOption "umlIncludeProtectedFields", "false"
-    options.addStringOption "umlIncludeDeprecatedClasses", "false"
-    options.addStringOption "umlIncludePrivateInnerClasses", "false"
-    options.addStringOption "umlIncludePackagePrivateInnerClasses", "false"
-    options.addStringOption "umlIncludeProtectedInnerClasses","false"
+    options.addStringOption "umlExcludedTypeReferences", "java.lang.Exception,java.lang.Object,java.lang.Enum,java.lang.annotation.Annotation"
+    options.addStringOption "umlJavaBeanPropertiesAsFields"
+    options.addBooleanOption "failOnCyclicPackageDependencies", false
     title= componentName
   }
 }
 
-
 jacocoTestReport {
-    reports {
-        xml.required= true
-        html.required= true
-    }
+  reports {
+    xml.required= true
+    html.required= true
+  }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -320,7 +303,6 @@ task examplesJar(type: Jar, dependsOn: test) {
   classifier = 'examples'
   from new File(buildDir, '/examples')
 }
-
 
 artifacts {
   archives javadocJar
@@ -338,7 +320,7 @@ publishing {
       pom.withXml {
         asNode().appendNode("name", componentName)
         asNode().appendNode("description", componentDesc)
-		asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/")
+        asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/")
         def properties = asNode().appendNode("properties")
         properties.appendNode("target", "3.8.0+")
         properties.appendNode("tags", "triggered")
@@ -400,11 +382,12 @@ dependencyCheck  {
   }
 }
 
+test {
+  useJUnitPlatform()
+}
 
 // disable spotbugsTests which checks our test code..
 spotbugsTest.enabled = false
-
-
 
 check.dependsOn jacocoTestReport
 processTestResources.dependsOn copyUnitTestProperties

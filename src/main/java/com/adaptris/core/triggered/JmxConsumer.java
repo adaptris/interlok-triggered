@@ -58,8 +58,7 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
   private MBeanServer getMBeanServer() {
     if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
       return MBeanServerFactory.findMBeanServer(null).get(0);
-    }
-    else {
+    } else {
       return MBeanServerFactory.createMBeanServer();
     }
   }
@@ -95,7 +94,6 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
     try {
       mBeanServer.unregisterMBean(ObjectName.getInstance(JMX_OBJECT_NAME_PREFIX + getJmxUid()));
     } catch (Exception e) {
-      ;
     }
   }
 
@@ -103,4 +101,5 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
   protected String newThreadName() {
     return DestinationHelper.threadName(retrieveAdaptrisMessageListener());
   }
+
 }

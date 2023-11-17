@@ -6,10 +6,9 @@
  */
 package com.adaptris.core.triggered;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -18,8 +17,8 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.adaptris.core.Adapter;
 import com.adaptris.core.AdaptrisMessage;
@@ -57,7 +56,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
   private String triggeredWorkflowKey;
   private MockEventHandlerWithState adapterEventHandler;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     adapterEventHandler = new MockEventHandlerWithState("AdapterEventHandler");
     adapter = new Adapter();
@@ -79,8 +78,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     MBeanServer mBeanServer = null;
     if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
       mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
-    }
-    else {
+    } else {
       fail("No JMX mbeanServer.");
     }
     ObjectName jmxTrigger = ObjectName.getInstance(JmxConsumer.JMX_OBJECT_NAME_PREFIX + "testJmxTrigger");
@@ -88,9 +86,9 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     assertEquals(ClosedState.getInstance(), channel.getEventHandlerForMessages().retrieveComponentState());
 
     mBeanServer.invoke(jmxTrigger, JmxChannelTrigger.TRIGGER_OPERATION, null, null);
-    assertEquals("Number of messages produced", 1, tp.getMessages().size());
-    assertEquals("Number of lifecycle events", 1, ep.getMessages().size());
-    assertEquals("Trigger message produced", 1, ((MockMessageProducer) channel.getTrigger().getProducer()).getMessages().size());
+    assertEquals(1, tp.getMessages().size(), "Number of messages produced");
+    assertEquals(1, ep.getMessages().size(), "Number of lifecycle events");
+    assertEquals(1, ((MockMessageProducer) channel.getTrigger().getProducer()).getMessages().size(), "Trigger message produced");
     checkMessagePayloads(tp.getMessages());
 
     assertWorkflowState(channel.getWorkflowList().getWorkflows(), ClosedState.getInstance());
@@ -112,10 +110,9 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     mc.submitMessage(AdaptrisMessageFactory.getDefaultInstance().newMessage());
     Thread.sleep(500);
 
-    assertEquals("Number of messages produced", 1, tp.getMessages().size());
-    assertEquals("Number of lifecycle events", 1, ep.getMessages().size());
-    assertEquals("Trigger message produced", 1, ((MockMessageProducer) channel.getTrigger().getProducer())
-        .getMessages().size());
+    assertEquals(1, tp.getMessages().size(), "Number of messages produced");
+    assertEquals(1, ep.getMessages().size(), "Number of lifecycle events");
+    assertEquals(1, ((MockMessageProducer) channel.getTrigger().getProducer()).getMessages().size(), "Trigger message produced");
     checkMessagePayloads(tp.getMessages());
 
     assertWorkflowState(channel.getWorkflowList().getWorkflows(), ClosedState.getInstance());
@@ -134,8 +131,8 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     LifecycleHelper.initAndStart(adapter);
     mc.submitMessage(AdaptrisMessageFactory.getDefaultInstance().newMessage());
     waitForMessages(tp, 1);
-    assertEquals("Number of messages produced", 1, tp.getMessages().size());
-    assertEquals("Trigger message produced", 1, ((MockMessageProducer) channel.getTrigger().getProducer()).getMessages().size());
+    assertEquals(1, tp.getMessages().size(), "Number of messages produced");
+    assertEquals(1, ((MockMessageProducer) channel.getTrigger().getProducer()).getMessages().size(), "Trigger message produced");
     checkMessagePayloads(tp.getMessages());
 
     assertWorkflowState(channel.getWorkflowList().getWorkflows(), ClosedState.getInstance());
@@ -144,15 +141,13 @@ public class TriggeredChannelTest extends ExampleChannelCase {
   }
 
   private void assertWorkflowState(List<Workflow> l, ComponentState state) {
-    for (Iterator<Workflow> i = l.iterator(); i.hasNext();) {
-      Workflow wf = i.next();
-      assertEquals("State of workflow " + wf.obtainWorkflowId(), state, wf.retrieveComponentState());
+    for (Workflow wf : l) {
+      assertEquals(state, wf.retrieveComponentState(), "State of workflow " + wf.obtainWorkflowId());
     }
   }
 
   private void checkMessagePayloads(List<AdaptrisMessage> l) {
-    for (Iterator<AdaptrisMessage> i = l.iterator(); i.hasNext();) {
-      AdaptrisMessage m = i.next();
+    for (AdaptrisMessage m : l) {
       assertEquals("The quick brown fox", m.getContent());
     }
   }
@@ -168,8 +163,7 @@ public class TriggeredChannelTest extends ExampleChannelCase {
       DefaultEventHandler sceh = new DefaultEventHandler();
       sceh.setMarshaller(new XStreamMarshaller());
       c.setEventHandlerForMessages(sceh);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
     cl.addChannel(c);
@@ -240,8 +234,8 @@ public class TriggeredChannelTest extends ExampleChannelCase {
   private StandardWorkflow findWorkflow(List<Workflow> l, String key) {
     StandardWorkflow result = null;
 
-    for (Iterator<Workflow> i = l.iterator(); i.hasNext();) {
-      StandardWorkflow w = (StandardWorkflow) i.next();
+    for (Workflow workflow : l) {
+      StandardWorkflow w = (StandardWorkflow) workflow;
       if (key.equals(w.obtainWorkflowId())) {
         result = w;
         break;
@@ -249,4 +243,5 @@ public class TriggeredChannelTest extends ExampleChannelCase {
     }
     return result;
   }
+
 }

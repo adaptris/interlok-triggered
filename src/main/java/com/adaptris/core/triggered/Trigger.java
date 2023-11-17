@@ -89,7 +89,6 @@ public class Trigger extends StandaloneConsumer implements LicensedComponent {
     LifecycleHelper.stop(getConnection());
   }
 
-
   /**
    * @return the producer
    */
@@ -98,11 +97,11 @@ public class Trigger extends StandaloneConsumer implements LicensedComponent {
   }
 
   /**
-   * @param p the producer to set
+   * @param p
+   *          the producer to set
    */
   public void setProducer(AdaptrisMessageProducer p) {
     producer = p;
   }
-
 
 }
