@@ -17,10 +17,6 @@ import com.adaptris.core.NullConnection;
 import com.adaptris.core.NullMessageConsumer;
 import com.adaptris.core.NullMessageProducer;
 import com.adaptris.core.StandaloneConsumer;
-import com.adaptris.core.licensing.License;
-import com.adaptris.core.licensing.License.LicenseType;
-import com.adaptris.core.licensing.LicenseChecker;
-import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.LifecycleHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -29,14 +25,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  * @config trigger
  *
- * @license STANDARD
  * @author lchan
  * @author $Author: lchan $
  */
 @XStreamAlias("trigger")
 @AdapterComponent
 @ComponentProfile(summary = "Standalone wrapper for a consumer and connection and is intended for use within a TriggeredChannel", tag = "consumer,triggered")
-public class Trigger extends StandaloneConsumer implements LicensedComponent {
+public class Trigger extends StandaloneConsumer {
 
   @NotNull
   @Valid
@@ -62,17 +57,6 @@ public class Trigger extends StandaloneConsumer implements LicensedComponent {
     LifecycleHelper.init(getConnection());
     LifecycleHelper.init(getProducer());
     LifecycleHelper.init(getConsumer());
-  }
-
-  @Override
-  public void prepare() throws CoreException {
-    LicenseChecker.newChecker().checkLicense(this);
-    super.prepare();
-  }
-
-  @Override
-  public boolean isEnabled(License license) {
-    return license.isEnabled(LicenseType.Standard);
   }
 
   @Override
