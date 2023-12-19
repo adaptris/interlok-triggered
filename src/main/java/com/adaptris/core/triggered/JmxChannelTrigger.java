@@ -32,4 +32,5 @@ public class JmxChannelTrigger implements JmxChannelTriggerMBean {
       Thread.currentThread().setName(oldName);
     }
   }
+
 }

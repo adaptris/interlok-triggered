@@ -6,29 +6,18 @@
  */
 package com.adaptris.core.triggered;
 
-import com.adaptris.core.CoreException;
 import com.adaptris.core.PollerImp;
-import com.adaptris.core.licensing.License;
-import com.adaptris.core.licensing.License.LicenseType;
-import com.adaptris.core.licensing.LicenseChecker;
-import com.adaptris.core.licensing.LicensedComponent;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * <p>
  * Implementation of <code>Poller</code> which only polls once upon start and never again.
  * </p>
- * 
+ *
  * @config triggered-one-time-poller
- * @license STANDARD
  */
 @XStreamAlias("triggered-one-time-poller")
-public class OneTimePoller extends PollerImp implements LicensedComponent {
-
-  @Override
-  public boolean isEnabled(License license) {
-    return license.isEnabled(LicenseType.Standard);
-  }
+public class OneTimePoller extends PollerImp {
 
   /**
    * <p>
@@ -36,13 +25,6 @@ public class OneTimePoller extends PollerImp implements LicensedComponent {
    * </p>
    */
   public OneTimePoller() {
-  }
-
-  /** @see com.adaptris.core.AdaptrisComponent#init() */
-  @Override
-  public void init() throws CoreException {
-    LicenseChecker.newChecker().checkLicense(this);
-    super.init();
   }
 
   @Override

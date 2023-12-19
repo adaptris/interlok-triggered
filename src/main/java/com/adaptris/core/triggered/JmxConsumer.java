@@ -8,10 +8,6 @@ import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.CoreException;
-import com.adaptris.core.licensing.License;
-import com.adaptris.core.licensing.License.LicenseType;
-import com.adaptris.core.licensing.LicenseChecker;
-import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.interlok.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -27,7 +23,6 @@ import lombok.NoArgsConstructor;
  *
  * @config triggered-jmx-consumer
  *
- * @license STANDARD
  * @author lchan
  *
  */
@@ -35,24 +30,13 @@ import lombok.NoArgsConstructor;
 @AdapterComponent
 @ComponentProfile(summary = "Consumer type that can fires based on a JMX invocation", tag = "consumer,jmx,triggered")
 @NoArgsConstructor
-public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedComponent {
+public class JmxConsumer extends AdaptrisMessageConsumerImp {
 
   public static final String JMX_OBJECT_NAME_PREFIX = "Adaptris:type=TriggeredChannel, uid=";
 
   @Override
   public void prepare() throws CoreException {
     Args.notNull(getUniqueId(), "unique-id");
-
-    LicenseChecker.newChecker().checkLicense(this);
-  }
-
-  @Override
-  public boolean isEnabled(License license) {
-    return license.isEnabled(LicenseType.Standard);
-  }
-
-  @Override
-  public void close() {
   }
 
   private MBeanServer getMBeanServer() {
@@ -69,12 +53,7 @@ public class JmxConsumer extends AdaptrisMessageConsumerImp implements LicensedC
   }
 
   @Override
-  public void init() throws CoreException {
-  }
-
-  @Override
   public void start() throws CoreException {
-
     try {
       MBeanServer mBeanServer = getMBeanServer();
 

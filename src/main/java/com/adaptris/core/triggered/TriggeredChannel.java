@@ -26,10 +26,6 @@ import com.adaptris.core.Poller;
 import com.adaptris.core.ProcessingExceptionHandler;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.Workflow;
-import com.adaptris.core.licensing.License;
-import com.adaptris.core.licensing.License.LicenseType;
-import com.adaptris.core.licensing.LicenseChecker;
-import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.core.util.LoggingHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -66,7 +62,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  * @config triggered-channel
  *
- * @license STANDARD
  * @see OneTimePoller
  * @see AdaptrisPollingConsumer
  * @see TriggeredProcessor
@@ -76,8 +71,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("triggered-channel")
 @AdapterComponent
 @ComponentProfile(summary = "A Channel whose lifecycle is determined by an external configurable trigger", tag = "triggered")
-public final class TriggeredChannel extends Channel implements
-AdaptrisMessageListener, LicensedComponent {
+public final class TriggeredChannel extends Channel implements AdaptrisMessageListener {
 
   @NotNull
   @Valid
@@ -123,7 +117,6 @@ AdaptrisMessageListener, LicensedComponent {
 
   @Override
   public void prepare() throws CoreException {
-    LicenseChecker.newChecker().checkLicense(this);
     if (getEventHandlerForMessages() != null) {
       log.info("EventHandler configured, bypassing Adapters event handler");
       registerEventHandler(getEventHandlerForMessages());
@@ -160,12 +153,6 @@ AdaptrisMessageListener, LicensedComponent {
     LifecycleHelper.close(trigger);
   }
 
-  @Override
-  public boolean isEnabled(License license) {
-    return license.isEnabled(LicenseType.Standard);
-  }
-
-
   // Trigger doesn't care about onSuccess / onFailure, it's job is just to start workflows when it
   // receives a msg.
   @Override
@@ -192,11 +179,9 @@ AdaptrisMessageListener, LicensedComponent {
         log.trace("Starting " + t.getName());
         t.start();
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
-    }
-    finally {
+    } finally {
       waitForThreads(threads);
       waitForErrorHandler();
       super.stop();
@@ -208,8 +193,7 @@ AdaptrisMessageListener, LicensedComponent {
     log.trace("Trigger processing complete");
     try {
       getTrigger().getProducer().produce(msg);
-    }
-    catch (ProduceException e) {
+    } catch (ProduceException e) {
       throw new RuntimeException(e);
     }
   }
@@ -220,8 +204,7 @@ AdaptrisMessageListener, LicensedComponent {
     while (!t.processingCompleted()) {
       try {
         Thread.sleep(ThreadLocalRandom.current().nextInt(1000));
-      }
-      catch (InterruptedException e) {
+      } catch (InterruptedException e) {
         ;
       }
     }
@@ -233,8 +216,7 @@ AdaptrisMessageListener, LicensedComponent {
       if (t.isAlive()) {
         try {
           t.join();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
       }
@@ -291,7 +273,6 @@ AdaptrisMessageListener, LicensedComponent {
     return LoggingHelper.friendlyName(this);
   }
 
-
   private class WorkflowStarter implements Runnable {
     private Workflow workflow;
 
@@ -309,8 +290,7 @@ AdaptrisMessageListener, LicensedComponent {
             ((OneTimePoller) p).processMessages();
           }
         }
-      }
-      catch (CoreException e) {
+      } catch (CoreException e) {
         log.error("Failure to start workflow", e);
       }
     }
@@ -319,6 +299,5 @@ AdaptrisMessageListener, LicensedComponent {
       return workflow.friendlyName();
     }
   }
-
 
 }
