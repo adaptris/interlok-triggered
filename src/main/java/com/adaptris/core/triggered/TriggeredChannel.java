@@ -25,10 +25,6 @@ import com.adaptris.core.Poller;
 import com.adaptris.core.ProcessingExceptionHandler;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.Workflow;
-import com.adaptris.core.licensing.License;
-import com.adaptris.core.licensing.License.LicenseType;
-import com.adaptris.core.licensing.LicenseChecker;
-import com.adaptris.core.licensing.LicensedComponent;
 import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.core.util.LoggingHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -65,7 +61,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  * @config triggered-channel
  *
- * @license STANDARD
  * @see OneTimePoller
  * @see AdaptrisPollingConsumer
  * @see TriggeredProcessor
@@ -75,7 +70,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("triggered-channel")
 @AdapterComponent
 @ComponentProfile(summary = "A Channel whose lifecycle is determined by an external configurable trigger", tag = "triggered")
-public final class TriggeredChannel extends Channel implements AdaptrisMessageListener, LicensedComponent {
+public final class TriggeredChannel extends Channel implements AdaptrisMessageListener {
 
   @NotNull
   @Valid
@@ -119,7 +114,6 @@ public final class TriggeredChannel extends Channel implements AdaptrisMessageLi
 
   @Override
   public void prepare() throws CoreException {
-    LicenseChecker.newChecker().checkLicense(this);
     if (getEventHandlerForMessages() != null) {
       log.info("EventHandler configured, bypassing Adapters event handler");
       registerEventHandler(getEventHandlerForMessages());
@@ -154,11 +148,6 @@ public final class TriggeredChannel extends Channel implements AdaptrisMessageLi
   @Override
   public void close() {
     LifecycleHelper.close(trigger);
-  }
-
-  @Override
-  public boolean isEnabled(License license) {
-    return license.isEnabled(LicenseType.Standard);
   }
 
   // Trigger doesn't care about onSuccess / onFailure, it's job is just to start workflows when it
