@@ -31,7 +31,7 @@ ext {
   componentDesc="Custom Channel implementation that can be externally triggered to start/stop"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.11'
+  slf4jVersion = '2.0.12'
   mockitoVersion = '5.2.0'
 }
 
